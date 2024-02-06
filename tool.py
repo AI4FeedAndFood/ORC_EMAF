@@ -426,7 +426,7 @@ def add_new_order(new_df, output_xlsx=CONFIG["output_xlsx"], sheet="Enregistreme
 
     wb.save(output_xlsx)
 
-def Tool(pdf_path, output_xlsx=CONFIG["output_xlsx"]):
+def Tool(pdf_path=CONFIG["input_path"], output_xlsx=CONFIG["output_xlsx"]):
     """The main function that link all steps
 
     Args:
@@ -475,12 +475,29 @@ def Tool(pdf_path, output_xlsx=CONFIG["output_xlsx"]):
         print(f"--> Scan {os.path.basename(pdf_path)} page {i_order}: {len([1 for r in rows if not r.header])} commandes détéctées et ajoutées.\n   (Deux type de verifications = deux lignes)")
 
 if __name__ == "__main__":
+
+    # A EFFACER SI ON VEUT JUSTE LANCER L'OUTIL
+
+    print("Lancement de l'outil !")
     
-    
+    import os
+
     start = time.time()
 
-    path = r"C:\Users\CF6P\Desktop\EMAF\DATA\scan6.pdf"
-    Tool(path)
+    path = input("Rentrer le chemin d'accès au pdf : ")
+        
+    if os.path.exists(path):
+        Tool(path)
+        taken_time = time.time() - start
+        print("temps :", round(taken_time,2), "secondes")
+    
+    else:
+        print("Le chemin n'existe pas")
 
-    taken_time = time.time() - start
-    print(taken_time)
+    #######################
+        
+    # Pour l'outil seul, utiliser les lignes si dessous
+    
+    # path = 
+        
+    # Tool(path)
