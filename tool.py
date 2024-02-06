@@ -438,7 +438,7 @@ def Tool(pdf_path=CONFIG["input_path"], output_xlsx=CONFIG["output_xlsx"]):
 
     scan_name = os.path.splitext(os.path.basename(pdf_path))[0]
 
-    print(f"-- START : Les commandes du scan {scan_name} vont être analysées -- ")
+    print(f"-- START : Les commandes du scan '{scan_name}' vont être analysées -- ")
     start = time.time()
     # Get the two images of the order
     images = images_from_PDF(pdf_path, rot=True)
@@ -470,14 +470,12 @@ def Tool(pdf_path=CONFIG["input_path"], output_xlsx=CONFIG["output_xlsx"]):
         # Finally use columns and lines informations to set a results dataframe
         order_df = generate_df(rows, columns)
 
-        order_df.to_excel(os.path.join(os.path.dirname(pdf_path), f"results_{scan_name}.xlsx"), index=False)
+        order_df.to_excel(os.path.join(output_xlsx, f"results_{scan_name}.xlsx"), index=False)
 
         # Join both informations to generate the response
         # add_new_order(order_df, output_xlsx=output_xlsx)
 
-
-        print(time.time() - start)
-        print(f"--> Scan {os.path.basename(pdf_path)} page {i_order}: {len([1 for r in rows if not r.header])} commandes détéctées et ajoutées.\n   (Deux type de verifications = deux lignes)")
+        print(f"-> Scan {os.path.basename(pdf_path)} page {i_order}: {len([1 for r in rows if not r.header])} commandes détéctées et ajoutées.\n   (Deux type de verifications = deux lignes)")
         
         return order_df
 

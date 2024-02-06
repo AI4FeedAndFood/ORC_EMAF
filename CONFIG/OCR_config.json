@@ -1,7 +1,7 @@
 {   
     "input_path" : "C:\\Users\\CF6P\\Desktop\\EMAF\\DATA\\eval",
 
-    "output_xlsx" : "C:\\Users\\CF6P\\Desktop\\EMAF\\DATA\\test3.xlsm",
+    "output_xlsx" : "C:\\Users\\CF6P\\Desktop\\EMAF\\DATA",
 
     "checkboxes": "CONFIG\\checks",
     
