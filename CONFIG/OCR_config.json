@@ -1,0 +1,47 @@
+{   
+    "input_path" : "C:\\Users\\CF6P\\Desktop\\EMAF\\DATA\\eval",
+
+    "output_xlsx" : "C:\\Users\\CF6P\\Desktop\\EMAF\\DATA\\test3.xlsm",
+
+    "checkboxes": "CONFIG\\checks",
+    
+    "columns": {
+        "Fabricant" : "M",
+        "Modèle" : "N", 
+        "NB de canaux" : "",
+        "N° de série" : "O",
+        "N° identification demandeur" : "P",
+        "Type de vérification" : "V",
+        "Nb. vol à vérifier" : "W",
+        "Nb de pesées" : "X",
+        "Type de volume" : "Y",
+        "EMT" : "Z", 
+        "Cônes/Seringues pour vérification" : "AA",
+        "Type de rapport" : "AC",
+        "Commentaires" : "AE"
+    },
+    
+    "check_columns": {
+        "Type de vérification" : ["En l'état", "Post maintenace"],
+        "Nb de pesées" : ["4","10"],
+        "Type de volume" : ["Classique", "Personnalisé"], 
+        "EMT" : ["8655", "Autre"], 
+        "Type de rapport" : ["Cofrac", "non Cofrac"]},
+
+    "default_lines" :  [
+        [[6, 1083], [6, 249]], 
+        [[148, 1085], [148, 96]], 
+        [[336, 1085], [336, 96]], 
+        [[429, 1085], [429, 97]], 
+        [[571, 1083], [571, 96]], 
+        [[713, 1084], [713, 95]], 
+        [[948, 1083], [948, 95]], 
+        [[1042, 1084], [1042, 95]], 
+        [[1139, 1083], [1139, 95]], 
+        [[1325, 1084], [1325, 199]], 
+        [[1468, 1084], [1468, 96]], 
+        [[1657, 1083], [1657, 94]], 
+        [[1845, 1084], [1845, 94]], 
+        [[2221, 1084], [2221, 94]]]
+}
+    
