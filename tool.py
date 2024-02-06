@@ -211,7 +211,7 @@ def get_text_lines(lines, checkboxes, raw_texts, x_im, y_im, delta=20):
     h_lines = lines["horizontal"]
     min_dist = min([abs(l[0][1]-y_im/2) for l in lines["horizontal"]]) # min distance between a line and the middle of the image
     if min_dist<100:
-        print("Rows set with lines")
+        # print("Rows set with lines")
         row_texts = []
         paired_rows = []
         for i in range(len(h_lines)-1):
@@ -226,7 +226,7 @@ def get_text_lines(lines, checkboxes, raw_texts, x_im, y_im, delta=20):
                     "y_bot" : y_bot
                 })
     else :
-        print("Rows set with text")
+        # print("Rows set with text")
         row_texts =  row_by_text(raw_texts, eps=30)
 
     row_lines = []
@@ -312,7 +312,7 @@ def get_columns(lines, rows):
     if len(matched_l_r)==len(col_names):
         for i in range(len(col_names)):
             columns.append(Column(col_names[i], matched_l_r[i][0], matched_l_r[i][1]))
-        print("Columns are set with lines")
+        # print("Columns are set with lines")
         return columns
         
     # Set the set of columns thanks to rows
@@ -320,7 +320,7 @@ def get_columns(lines, rows):
         if len(row.row_text)==len(col_names):
             for i in range(len(col_names)):
                 columns.append(Column(col_names[i], row.row_text[i]["box"][0], row.row_text[i]["box"][2]))
-            print("Columns are set with text")
+            # print("Columns are set with text")
             return columns
         
     else:
@@ -436,7 +436,9 @@ def Tool(pdf_path=CONFIG["input_path"], output_xlsx=CONFIG["output_xlsx"]):
         _type_: _description_
     """
 
-    print(f"-- START : Les commandes du scan {os.path.basename(pdf_path)} vont être analysées -- ")
+    scan_name = os.path.splitext(os.path.basename(pdf_path))[0]
+
+    print(f"-- START : Les commandes du scan {scan_name} vont être analysées -- ")
     start = time.time()
     # Get the two images of the order
     images = images_from_PDF(pdf_path, rot=True)
@@ -468,11 +470,16 @@ def Tool(pdf_path=CONFIG["input_path"], output_xlsx=CONFIG["output_xlsx"]):
         # Finally use columns and lines informations to set a results dataframe
         order_df = generate_df(rows, columns)
 
+        order_df.to_excel(os.path.join(os.path.dirname(pdf_path), f"results_{scan_name}.xlsx"), index=False)
+
         # Join both informations to generate the response
-        add_new_order(order_df, output_xlsx=output_xlsx)
+        # add_new_order(order_df, output_xlsx=output_xlsx)
+
 
         print(time.time() - start)
         print(f"--> Scan {os.path.basename(pdf_path)} page {i_order}: {len([1 for r in rows if not r.header])} commandes détéctées et ajoutées.\n   (Deux type de verifications = deux lignes)")
+        
+        return order_df
 
 if __name__ == "__main__":
 
@@ -489,7 +496,7 @@ if __name__ == "__main__":
     if os.path.exists(path):
         Tool(path)
         taken_time = time.time() - start
-        print("temps :", round(taken_time,2), "secondes")
+        print("FIN ; Temps - ", round(taken_time,2), "secondes")
     
     else:
         print("Le chemin n'existe pas")
