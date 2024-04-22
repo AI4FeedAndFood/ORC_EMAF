@@ -1,24 +1,24 @@
 {   
     "input_path" : "C:\\Users\\CF6P\\Desktop\\EMAF\\DATA\\eval",
+    "output_path" : "C:\\Users\\CF6P\\Desktop\\EMAF\\ORC_EMAF\\OCR.xlsm",
 
-    "output_xlsx" : "C:\\Users\\CF6P\\Desktop\\EMAF\\DATA",
-
-    "checkboxes": "CONFIG\\checks",
+    "checkboxes": "C:\\Users\\CF6P\\Desktop\\EMAF\\ORC_EMAF\\CONFIG\\checks",
+    "lists": "C:\\Users\\CF6P\\Desktop\\EMAF\\ORC_EMAF\\CONFIG\\lists.xlsx",
     
     "columns": {
-        "Fabricant" : "M",
-        "Modèle" : "N", 
+        "Fabricant" : "A",
+        "Modèle" : "B", 
         "NB de canaux" : "",
-        "N° de série" : "O",
-        "N° identification demandeur" : "P",
-        "Type de vérification" : "V",
-        "Nb. vol à vérifier" : "W",
-        "Nb de pesées" : "X",
-        "Type de volume" : "Y",
-        "EMT" : "Z", 
-        "Cônes/Seringues pour vérification" : "AA",
-        "Type de rapport" : "AC",
-        "Commentaires" : "AE"
+        "N° de série" : "C",
+        "N° identification demandeur" : "D",
+        "Type de vérification" : "F",
+        "Nb. vol à vérifier" : "G",
+        "Nb de pesées" : "H",
+        "Type de volume" : "I",
+        "EMT" : "J", 
+        "Cônes/Seringues pour vérification" : "K",
+        "Type de rapport" : "M",
+        "Commentaires" : "O"
     },
     
     "check_columns": {
@@ -26,7 +26,8 @@
         "Nb de pesées" : ["4","10"],
         "Type de volume" : ["Classique", "Personnalisé"], 
         "EMT" : ["8655", "Autre"], 
-        "Type de rapport" : ["Cofrac", "non Cofrac"]},
+        "Type de rapport" : ["Cofrac", "non Cofrac"]
+    },
 
     "default_lines" :  [
         [[6, 1083], [6, 249]], 
@@ -42,6 +43,7 @@
         [[1468, 1084], [1468, 96]], 
         [[1657, 1083], [1657, 94]], 
         [[1845, 1084], [1845, 94]], 
-        [[2221, 1084], [2221, 94]]]
+        [[2221, 1084], [2221, 94]]
+    ]
 }
     

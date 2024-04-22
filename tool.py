@@ -5,6 +5,7 @@ import cv2
 import openpyxl
 import matplotlib.pyplot as plt
 import pandas as pd
+import sys
 from copy import deepcopy
 import os
 from unidecode import unidecode
@@ -17,11 +18,16 @@ year = datetime.now().year
 from paddleocr import PaddleOCR
 
 from JaroDistance import jaro_distance
-from imageTools import detect_checkboxes, get_lines, delete_HoughLines
-from ProcessPDF import images_from_PDF, process_image
+from imageTools import get_checkboxes, get_lines, delete_HoughLines
+from ProcessPDF import images_from_PDF, process_image, get_all_pdfs_pathes
 
-CONFIG_PATH  = r"CONFIG\OCR_config.json"
-CONFIG = json.load(open(CONFIG_PATH, encoding="utf-8"))
+application_path = r"C:\Users\CF6P\Desktop\EMAF\Tool test\scripts"
+
+CONFIG_JSON_PATH  = os.path.join(application_path, "CONFIG\OCR_config.json")
+CONFIG = json.load(open(CONFIG_JSON_PATH, encoding="utf-8"))
+
+CHECKBOXES = os.path.join(application_path, CONFIG["checkboxes"])
+LISTS = os.path.join(application_path, CONFIG["lists"])
 
 class Row:
     def __init__(self, y_top, y_bot, row_text, checkboxes):
@@ -102,8 +108,8 @@ def get_structural_elements(order_image, raw_image, y_im, eps=50, show=False):
         }
     
     # Extract horizontal lines and checkboxes
-    template_pathes = [os.path.join(CONFIG["checkboxes"], dir) for dir in os.listdir(CONFIG["checkboxes"]) if os.path.splitext(dir)[1].lower() in [".png", ".jpg"]]
-    checkboxes = detect_checkboxes(order_image, template_pathes=template_pathes, show=False) # List of checkbox dict {"TOP_LEFT_X"...}
+    template_pathes = [os.path.join(CHECKBOXES, dir) for dir in os.listdir(CHECKBOXES) if os.path.splitext(dir)[1].lower() in [".png", ".jpg"]]
+    checkboxes = get_checkboxes(order_image, template_pathes=template_pathes, show=False) # List of checkbox dict {"TOP_LEFT_X"...}
         
     # Delete lines that come from checkboxes
     cleaned_lines = [lines["vertical"][0]]
@@ -349,7 +355,7 @@ def _clean_col_res(col, res):
         return text_res
     
     if col.name == "Fabricant":
-        models_serie = list(pd.read_excel(r"CONFIG\lists.xlsx", sheet_name="lists", index_col=None).dropna()[col.name])
+        models_serie = list(pd.read_excel(LISTS, sheet_name="lists", index_col=None).dropna()[col.name])
         for t, text in enumerate(res):
             i_max, max_val = max(enumerate([jaro_distance(mod.lower(), text.lower()) for mod in models_serie]), key=lambda x: x[1])
             if max_val>0.85:
@@ -366,6 +372,8 @@ def _clean_col_res(col, res):
         for t, text in enumerate(res):
             if "P!P" in text:
                 res[t] = text.replace("P!P", "PIP")
+            if "P:P" in text:
+                res[t] = text.replace("P:P", "PIP")
         return res
     
     else: 
@@ -398,6 +406,7 @@ def generate_df(rows, columns):
                     return text["text"].strip(" ")
             return ""        
     
+    # Handle cols from the scan
     rows = [r for r in rows if not r.header]
     res_dict = {}
     for col in columns:
@@ -406,17 +415,30 @@ def generate_df(rows, columns):
         for row in rows:
             col_res.append(_get_cell(col, row))
         res_dict[col.name] = _clean_col_res(col, col_res)
+    
+    # Handle added cols
+    for col_name in CONFIG["added_columns"].keys():
+        col_res = []
 
-    order_df = pd.DataFrame(res_dict, columns=list(CONFIG["columns"].keys()))
+        for row in rows:
+
+            # Add the duplicate info
+            if col_name=="LIGNE DUPLIQUEE":
+                col_res.append(str(row.duplicate))
+
+        res_dict[col_name] = col_res
+
+    order_df = pd.DataFrame(res_dict, columns=list(CONFIG["columns"].keys())+list(CONFIG["added_columns"].keys()))
 
     return order_df
 
-def add_new_order(new_df, output_xlsx=CONFIG["output_xlsx"], sheet="Enregistrement", max_row_check="M"):
+def add_new_order(new_df, output_xlsx, sheet="Enregistrement", start_check=1):
 
-    wb = openpyxl.load_workbook(output_xlsx, read_only=False, keep_vba=True)
+    wb = openpyxl.load_workbook(output_xlsx, read_only=False)
     sheet = wb["Enregistrement"]
-    for max_row, row in enumerate(list(sheet.rows)[4:], 4): # Last wrote row
-        if not any([c.value for c in row[12:15]]):
+    max_row = start_check
+    for max_row, row in enumerate(list(sheet.rows)[start_check:], start_check): # Last wrote row
+        if not any([c.value for c in row[0:2]]): # Check if fields A,B, C are empty or not
             break
 
     for i in range(len(new_df)):
@@ -424,9 +446,13 @@ def add_new_order(new_df, output_xlsx=CONFIG["output_xlsx"], sheet="Enregistreme
             if col_xls:
                 sheet[col_xls+str(i+max_row+1)].value = new_df[col_df].iloc[i]
 
+        for col_df, col_xls in CONFIG["added_columns"].items():
+            if col_xls:
+                sheet[col_xls+str(i+max_row+1)].value = new_df[col_df].iloc[i]
+
     wb.save(output_xlsx)
 
-def Tool(pdf_path=CONFIG["input_path"], output_xlsx=CONFIG["output_xlsx"]):
+def Tool(pdf_path, output_path):
     """The main function that link all steps
 
     Args:
@@ -470,39 +496,47 @@ def Tool(pdf_path=CONFIG["input_path"], output_xlsx=CONFIG["output_xlsx"]):
         # Finally use columns and lines informations to set a results dataframe
         order_df = generate_df(rows, columns)
 
-        order_df.to_excel(os.path.join(output_xlsx, f"results_{scan_name}.xlsx"), index=False)
-
-        # Join both informations to generate the response
-        # add_new_order(order_df, output_xlsx=output_xlsx)
+        # Save the result
+        # order_df.to_excel(output_path, index=False)
+        add_new_order(order_df, output_xlsx=output_path)
 
         print(f"-> Scan {os.path.basename(pdf_path)} page {i_order}: {len([1 for r in rows if not r.header])} commandes détéctées et ajoutées.\n   (Deux type de verifications = deux lignes)")
         
         return order_df
 
+def main(input_path, config=CONFIG):
+    # Given path is a pdf
+    
+    output_path = config["output_path"]
+
+    if os.path.splitext(input_path)[-1].lower() == ".pdf":
+        Tool(input_path, output_path)
+
+    # Give path is a folder containing pdf
+    if os.path.isdir(input_path):
+        all_pdf_in_dir = get_all_pdfs_pathes(input_path)
+        for pdf_path in all_pdf_in_dir:
+            Tool(pdf_path, output_path)
+
 if __name__ == "__main__":
 
     # A EFFACER SI ON VEUT JUSTE LANCER L'OUTIL
 
-    print("Lancement de l'outil !")
+    print("Lancement de l'outil !\nAppuyez sur ctrl+c pour interrompre")
     
     import os
 
     start = time.time()
 
-    path = input("Rentrer le chemin d'accès au pdf : ")
-        
+    # path = input(f"Rentrez le chemin d'accès au pdf : ")
+    path = CONFIG["input_path"]
+
     if os.path.exists(path):
-        Tool(path)
+        main(path, config=CONFIG)
         taken_time = time.time() - start
         print("FIN ; Temps - ", round(taken_time,2), "secondes")
     
     else:
         print("Le chemin n'existe pas")
 
-    #######################
-        
-    # Pour l'outil seul, utiliser les lignes si dessous
-    
-    # path = 
-        
-    # Tool(path)
+    time.sleep(5)

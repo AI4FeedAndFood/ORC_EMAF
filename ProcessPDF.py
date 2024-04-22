@@ -4,9 +4,32 @@ import cv2
 import fitz
 from PIL import Image
 import matplotlib.pyplot as plt
-
+import win32com
 
 from imageTools import get_iou
+
+def extractFromMailBox(savePath, SenderEmailAddress, n_message_stop=50):
+
+    outlook = win32com.client.Dispatch("Outlook.Application").GetNamespace("MAPI")
+    inbox = outlook.GetDefaultFolder(6) 
+    messages = inbox.Items
+    messages.Sort("ReceivedTime", True)
+
+    n_message = 0
+    while n_message <= n_message_stop:
+        message = messages[n_message]
+        try:
+            n_message+=1
+            if message.Unread and message.SenderEmailAddress==SenderEmailAddress:
+                # attachments = message.Attachments
+                # attachment = attachments.Item(1)
+                for attachment in message.Attachments:
+                    attachment.SaveAsFile(os.path.join(savePath, str(attachment.FileName)))
+                    if message.Unread:
+                        message.Unread = False
+                    break
+        except:
+            pass
 
 def get_all_pdfs_pathes(dir_path):
     docs = os.listdir(dir_path)

@@ -1,12 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
-import json
 from copy import deepcopy
-
-OCR_HELPER_JSON_PATH  = r"CONFIG\\OCR_config.json"
-CONFIG_DICT = json.load(open(OCR_HELPER_JSON_PATH, encoding="utf-8"))
- 
 
 def preprocessed_image(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -161,7 +156,7 @@ def checkbox_match(templates, cropped_image):
 
     return detections  
 
-def get_checkboxes(cropped_image, templates, show=False):
+def find_checkboxes(cropped_image, templates, show=False):
 
     detections = checkbox_match(templates, cropped_image)
     filtered_detection = non_max_suppression(detections)
@@ -170,14 +165,14 @@ def get_checkboxes(cropped_image, templates, show=False):
     
     return filtered_detection
 
-def detect_checkboxes(image, template_pathes, show=False):
+def get_checkboxes(image, template_pathes, show=False):
 
     TRANSFORM = [lambda x: x]   
     
     templates = [Template(image_path=t_path, label="check", color=(0, 0, 0), matching_threshold=0.8, transform_list=TRANSFORM)
                  for t_path in template_pathes]        
     
-    checkboxes = get_checkboxes(image, templates=templates, show=show)
+    checkboxes = find_checkboxes(image, templates=templates, show=show)
 
     return checkboxes
 
