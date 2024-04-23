@@ -1,7 +1,7 @@
 {   
-    "input_path" : "C:\\Users\\CF6P\\Desktop\\EMAF\\DATA\\eval",
+    "input_path" : "C:\\Users\\CF6P\\Desktop\\EMAF\\DATA\\test",
     "output_path" : "C:\\Users\\CF6P\\Desktop\\EMAF\\Extraction.xlsx",
-    "copy_path" : "C:\\Users\\CF6P\\Desktop\\EMAF\\Tool test\\test",
+    "copy_path" : "",
 
     "senderMailAdress": "",
 

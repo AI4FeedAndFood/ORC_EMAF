@@ -439,9 +439,9 @@ def add_new_order(new_df, output_xlsx, sheet="Enregistrement", start_check=1):
     sheet = wb["Enregistrement"]
     max_row = start_check
     for max_row, row in enumerate(list(sheet.rows)[start_check:], start_check): # Last wrote row
-        if not any([c.value for c in row[0:2]]): # Check if fields A,B, C are empty or not
+        if not any([c.value for c in row[0:10]]): # Check if fields A,B, C are empty or not
             break
-
+    print(max_row)
     for i in range(len(new_df)):
         for col_df, col_xls in CONFIG["columns"].items():
             if col_xls:
@@ -522,33 +522,35 @@ def main(input_path, config=CONFIG):
 if __name__ == "__main__":
 
     # A EFFACER SI ON VEUT JUSTE LANCER L'OUTIL
+    print("####### START #######")
 
-    print("Lancement de l'outil !\nAppuyez sur ctrl+c pour interrompre")
+    print("\nLancement de l'outil !\nAppuyez sur ctrl+c pour interrompre")
     
     import os
 
     start = time.time()
 
     # path = input(f"Rentrez le chemin d'accès au pdf : ")
-    input_path = os.path.normpath(CONFIG["input_path"])
+    input_path = os.path.normpath(CONFIG["input_path"]) if os.path.exists(CONFIG["input_path"]) else ""
     senderMailAdress = CONFIG["senderMailAdress"]
-    copy_path = os.path.normpath(CONFIG["copy_path"])
+    copy_path = os.path.normpath(CONFIG["copy_path"]) if CONFIG["copy_path"] else ""
+    print(input_path, copy_path)
 
     # Get all image from mailbox thanks to the email 
-    if senderMailAdress and os.path.exists(input_path):
+    if senderMailAdress and input_path:
         extract_from_mailbox(input_path, senderMailAdress)
 
     # Run the tool for each image of each pdf
-    if os.path.exists(input_path):
+    if input_path:
         main(input_path, config=CONFIG)
         taken_time = time.time() - start
-        print("FIN ; Temps - ", round(taken_time,2), "secondes")
+        print("Fin de la lecture ; Temps - ", round(taken_time,2), "secondes")
 
     # Save all pdf in the copy folder
-    if os.path.exists(copy_path) and os.path.exists(input_path):
+    if copy_path and input_path:
         move_pdf(input_path, copy_path)
+        print("Les pdfs ont été copiés")
     
-    else:
-        print("Le chemin de copie n'existe pas")
+    print("\n######### FIN #########")
 
     time.sleep(8)

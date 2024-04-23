@@ -142,14 +142,20 @@ def get_main_rect(processed_image, rectangles):
         """
         Process rectangles for tables (table and landscape format)
         """  
+        rot = 0     
         maxarea = 0
         for i, rect in enumerate(rectangles):
+            # Correct the X and Y value if landscape rect
+            area = rectangles[i][1][0]*rectangles[i][1][1]
             if 45<rect[-1]:
                 rectangles[i][1] = (rectangles[i][1][1], rectangles[i][1][0])
-                if maxarea < rectangles[i][1][0]*rectangles[i][1][1]:
-                    rot = 90-rect[-1]
+                if maxarea < area:
+                    rot = rect[-1]-90
+                    maxarea = area
             elif maxarea < rectangles[i][1][0]*rectangles[i][1][1]:
                 rot = rect[-1] # The rot angle is chosen by taken the biggest rect angle
+                maxarea = area
+        rot = 0 if abs(rot)>4 else rot
         
         xy_wh_rot = [[], [], []]
         for rect in rectangles:
