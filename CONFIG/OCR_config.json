@@ -1,9 +1,12 @@
 {   
     "input_path" : "C:\\Users\\CF6P\\Desktop\\EMAF\\DATA\\eval",
-    "output_path" : "C:\\Users\\CF6P\\Desktop\\EMAF\\ORC_EMAF\\OCR.xlsm",
+    "output_path" : "C:\\Users\\CF6P\\Desktop\\EMAF\\Extraction.xlsx",
+    "copy_path" : "C:\\Users\\CF6P\\Desktop\\EMAF\\Tool test\\test",
 
-    "checkboxes": "C:\\Users\\CF6P\\Desktop\\EMAF\\ORC_EMAF\\CONFIG\\checks",
-    "lists": "C:\\Users\\CF6P\\Desktop\\EMAF\\ORC_EMAF\\CONFIG\\lists.xlsx",
+    "senderMailAdress": "",
+
+    "checkboxes": "CONFIG\\checks",
+    "lists": "CONFIG\\lists.xlsx",
     
     "columns": {
         "Fabricant" : "A",
@@ -19,6 +22,9 @@
         "Cônes/Seringues pour vérification" : "K",
         "Type de rapport" : "M",
         "Commentaires" : "O"
+    },
+    "added_columns" : {
+        "LIGNE DUPLIQUEE" : "Q"
     },
     
     "check_columns": {

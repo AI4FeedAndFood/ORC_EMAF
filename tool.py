@@ -19,9 +19,10 @@ from paddleocr import PaddleOCR
 
 from JaroDistance import jaro_distance
 from imageTools import get_checkboxes, get_lines, delete_HoughLines
-from ProcessPDF import images_from_PDF, process_image, get_all_pdfs_pathes
+from ProcessPDF import images_from_PDF, process_image, get_all_pdfs_pathes, extract_from_mailbox, move_pdf
 
-application_path = r"C:\Users\CF6P\Desktop\EMAF\Tool test\scripts"
+# CHNAGE THIS PATH TO THE CURRENT LOCATION 
+application_path = os.path.realpath(os.path.dirname(__file__))
 
 CONFIG_JSON_PATH  = os.path.join(application_path, "CONFIG\OCR_config.json")
 CONFIG = json.load(open(CONFIG_JSON_PATH, encoding="utf-8"))
@@ -529,14 +530,25 @@ if __name__ == "__main__":
     start = time.time()
 
     # path = input(f"Rentrez le chemin d'accès au pdf : ")
-    path = CONFIG["input_path"]
+    input_path = os.path.normpath(CONFIG["input_path"])
+    senderMailAdress = CONFIG["senderMailAdress"]
+    copy_path = os.path.normpath(CONFIG["copy_path"])
 
-    if os.path.exists(path):
-        main(path, config=CONFIG)
+    # Get all image from mailbox thanks to the email 
+    if senderMailAdress and os.path.exists(input_path):
+        extract_from_mailbox(input_path, senderMailAdress)
+
+    # Run the tool for each image of each pdf
+    if os.path.exists(input_path):
+        main(input_path, config=CONFIG)
         taken_time = time.time() - start
         print("FIN ; Temps - ", round(taken_time,2), "secondes")
+
+    # Save all pdf in the copy folder
+    if os.path.exists(copy_path) and os.path.exists(input_path):
+        move_pdf(input_path, copy_path)
     
     else:
-        print("Le chemin n'existe pas")
+        print("Le chemin de copie n'existe pas")
 
-    time.sleep(5)
+    time.sleep(8)

@@ -1,14 +1,17 @@
 import os
-import numpy as np
 import cv2
 import fitz
-from PIL import Image
+
+import numpy as np
 import matplotlib.pyplot as plt
+
+from shutil import copyfile
+from PIL import Image
 import win32com
 
 from imageTools import get_iou
 
-def extractFromMailBox(savePath, SenderEmailAddress, n_message_stop=50):
+def extract_from_mailbox(savePath, SenderEmailAddress, n_message_stop=50):
 
     outlook = win32com.client.Dispatch("Outlook.Application").GetNamespace("MAPI")
     inbox = outlook.GetDefaultFolder(6) 
@@ -30,6 +33,19 @@ def extractFromMailBox(savePath, SenderEmailAddress, n_message_stop=50):
                     break
         except:
             pass
+
+def move_pdf(input_path, copy_path, rename = "", mode="same"):
+
+    for pdf_path in get_all_pdfs_pathes(input_path):
+        base, extension = os.path.splitext(os.path.split(pdf_path)[1])
+        if rename:
+            base=rename
+        
+        if mode == "same":
+            new_name = base+extension
+
+        copyfile(pdf_path, f"{copy_path}/{new_name}")
+        os.remove(pdf_path)
 
 def get_all_pdfs_pathes(dir_path):
     docs = os.listdir(dir_path)
