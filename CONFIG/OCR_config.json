@@ -3,8 +3,6 @@
     "output_path" : "C:\\Users\\CF6P\\Desktop\\EMAF\\Extraction.xlsx",
     "copy_path" : "",
 
-    "senderMailAdress": "",
-
     "checkboxes": "CONFIG\\checks",
     "lists": "CONFIG\\lists.xlsx",
     

@@ -5,7 +5,6 @@ import cv2
 import openpyxl
 import matplotlib.pyplot as plt
 import pandas as pd
-import sys
 from copy import deepcopy
 import os
 from unidecode import unidecode
@@ -19,7 +18,7 @@ from paddleocr import PaddleOCR
 
 from JaroDistance import jaro_distance
 from imageTools import get_checkboxes, get_lines, delete_HoughLines
-from ProcessPDF import images_from_PDF, process_image, get_all_pdfs_pathes, extract_from_mailbox, move_pdf
+from ProcessPDF import images_from_PDF, process_image, get_all_pdfs_pathes, move_pdf
 
 # CHNAGE THIS PATH TO THE CURRENT LOCATION 
 application_path = os.path.realpath(os.path.dirname(__file__))
@@ -441,7 +440,7 @@ def add_new_order(new_df, output_xlsx, sheet="Enregistrement", start_check=1):
     for max_row, row in enumerate(list(sheet.rows)[start_check:], start_check): # Last wrote row
         if not any([c.value for c in row[0:10]]): # Check if fields A,B, C are empty or not
             break
-    print(max_row)
+        
     for i in range(len(new_df)):
         for col_df, col_xls in CONFIG["columns"].items():
             if col_xls:
@@ -478,6 +477,8 @@ def Tool(pdf_path, output_path):
 
         # Otsu binaraized is the main image to use
         order_image = process_image(raw_order_image)
+        # plt.imshow(order_image)
+        # plt.show()
         y_im, x_im = order_image.shape[:2]
 
         # First process the image to extract structural elements
@@ -492,7 +493,6 @@ def Tool(pdf_path, output_path):
         # Once it's done, create Line object wich resume texts, checkboxes, and lines
         rows = get_text_lines(lines, checkboxes, raw_texts, x_im, y_im, delta=20)
         columns = get_columns(lines, rows)
-        
 
         # Finally use columns and lines informations to set a results dataframe
         order_df = generate_df(rows, columns)
@@ -532,13 +532,7 @@ if __name__ == "__main__":
 
     # path = input(f"Rentrez le chemin d'accès au pdf : ")
     input_path = os.path.normpath(CONFIG["input_path"]) if os.path.exists(CONFIG["input_path"]) else ""
-    senderMailAdress = CONFIG["senderMailAdress"]
     copy_path = os.path.normpath(CONFIG["copy_path"]) if CONFIG["copy_path"] else ""
-    print(input_path, copy_path)
-
-    # Get all image from mailbox thanks to the email 
-    if senderMailAdress and input_path:
-        extract_from_mailbox(input_path, senderMailAdress)
 
     # Run the tool for each image of each pdf
     if input_path:

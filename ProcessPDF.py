@@ -7,32 +7,8 @@ import matplotlib.pyplot as plt
 
 from shutil import copyfile
 from PIL import Image
-import win32com
 
 from imageTools import get_iou
-
-def extract_from_mailbox(savePath, SenderEmailAddress, n_message_stop=50):
-
-    outlook = win32com.client.Dispatch("Outlook.Application").GetNamespace("MAPI")
-    inbox = outlook.GetDefaultFolder(6) 
-    messages = inbox.Items
-    messages.Sort("ReceivedTime", True)
-
-    n_message = 0
-    while n_message <= n_message_stop:
-        message = messages[n_message]
-        try:
-            n_message+=1
-            if message.Unread and message.SenderEmailAddress==SenderEmailAddress:
-                # attachments = message.Attachments
-                # attachment = attachments.Item(1)
-                for attachment in message.Attachments:
-                    attachment.SaveAsFile(os.path.join(savePath, str(attachment.FileName)))
-                    if message.Unread:
-                        message.Unread = False
-                    break
-        except:
-            pass
 
 def move_pdf(input_path, copy_path, rename = "", mode="same"):
 
